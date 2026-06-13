@@ -153,6 +153,7 @@ export const userRouter = createTRPCRouter({
         obapiProviderId: z.string().optional(),
         bankingId: z.string().optional(),
         preferredLanguage: z.string().optional(),
+        venmoHandle: z.string().nullable().optional(),
       }),
     )
     .mutation(async ({ input, ctx }) => {

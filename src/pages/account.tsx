@@ -8,6 +8,7 @@ import {
   HeartHandshakeIcon,
   Languages,
   Star,
+  Wallet,
 } from 'lucide-react';
 import type { GetServerSideProps } from 'next';
 import { signOut } from 'next-auth/react';
@@ -22,6 +23,7 @@ import { LanguagePicker } from '~/components/Account/LanguagePicker';
 import { SubmitFeedback } from '~/components/Account/SubmitFeedback';
 import { SubscribeNotification } from '~/components/Account/SubscribeNotification';
 import { UpdateName } from '~/components/Account/UpdateDetails';
+import { UpdateVenmoHandle } from '~/components/Account/UpdateVenmoHandle';
 import MainLayout from '~/components/Layout/MainLayout';
 import { EntityAvatar } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
@@ -47,6 +49,10 @@ const AccountPage: NextPageWithUser<{
   const { t } = useTranslation();
   const router = useRouter();
   const userQuery = api.user.me.useQuery();
+  const venmoQuery = api.user.getUserDetails.useQuery(
+    { userId: userQuery.data?.id ?? 0 },
+    { enabled: !!userQuery.data?.id },
+  );
   const downloadQuery = api.user.downloadData.useMutation();
   const updateDetailsMutation = api.user.updateUserDetail.useMutation();
 
@@ -124,6 +130,16 @@ const AccountPage: NextPageWithUser<{
               {t('account.change_language')}
             </AccountButton>
           </LanguagePicker>
+
+          <UpdateVenmoHandle
+            key={venmoQuery.data?.venmoHandle ?? 'none'}
+            defaultHandle={venmoQuery.data?.venmoHandle}
+          >
+            <AccountButton>
+              <Wallet className="size-5 text-[#008CFF]" />
+              Venmo username
+            </AccountButton>
+          </UpdateVenmoHandle>
 
           <BankConnection
             bankConnectionEnabled={bankConnectionEnabled}

@@ -57,6 +57,7 @@ export const SelectUserOrGroup: React.FC<{
           image: null,
           currency: 'USD',
           defaultCurrency: null,
+          venmoHandle: null,
           obapiProviderId: null,
           bankingId: null,
           preferredLanguage: '',

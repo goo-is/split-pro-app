@@ -49,6 +49,7 @@ model User {
   preferredLanguage    String               @default("")
   bankingId            String?
   obapiProviderId      String?
+  venmoHandle          String?
   accounts             Account[]
   friendBalances       BalanceView[]        @relation("FriendBalanceView")
   userBalances         BalanceView[]        @relation("UserBalanceView")

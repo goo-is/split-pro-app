@@ -25,6 +25,7 @@ const createMockUser = (id: number, name: string, email: string): User => ({
   preferredLanguage: 'en',
   obapiProviderId: null,
   bankingId: null,
+  venmoHandle: null,
   hiddenFriendIds: [],
 });
 

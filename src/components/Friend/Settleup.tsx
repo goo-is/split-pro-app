@@ -15,6 +15,7 @@ import { Button } from '../ui/button';
 import { CurrencyInput } from '../ui/currency-input';
 import { AppDrawer } from '../ui/drawer';
 import { FriendBalance } from './FriendBalance';
+import { VenmoPayButton } from './VenmoPayButton';
 
 export const SettleUp: React.FC<
   React.PropsWithChildren<{
@@ -174,6 +175,12 @@ export const SettleUp: React.FC<
             strValue={amountStr}
             className="mx-auto mt-4 w-[150px] text-center text-lg"
             onValueChange={onCurrencyInputValueChange}
+          />
+          <VenmoPayButton
+            amount={amount}
+            currency={balanceToSettle.currency}
+            txn={isCurrentUserPaying ? 'pay' : 'charge'}
+            recipientHandle={friend.venmoHandle ?? undefined}
           />
         </div>
       )}

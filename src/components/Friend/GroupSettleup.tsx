@@ -11,6 +11,7 @@ import { EntityAvatar } from '../ui/avatar';
 import { CurrencyInput } from '../ui/currency-input';
 import { AppDrawer } from '../ui/drawer';
 import { useSession } from 'next-auth/react';
+import { VenmoPayButton } from './VenmoPayButton';
 
 export const GroupSettleUp: React.FC<{
   amount: bigint;
@@ -110,6 +111,16 @@ export const GroupSettleUp: React.FC<{
           className="mx-auto mt-4 w-[150px] text-center text-lg"
           onValueChange={onCurrencyInputValueChange}
         />
+        {(sender.id === data?.user.id || receiver.id === data?.user.id) && (
+          <VenmoPayButton
+            amount={amount}
+            currency={currency}
+            txn={sender.id === data?.user.id ? 'pay' : 'charge'}
+            recipientHandle={
+              (sender.id === data?.user.id ? receiver : sender).venmoHandle ?? undefined
+            }
+          />
+        )}
       </div>
     </AppDrawer>
   );
