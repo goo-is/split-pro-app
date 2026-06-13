@@ -8,6 +8,7 @@ import {
   Info,
   Merge,
   PlusIcon,
+  Search,
   Share,
   Trash2,
   UserPlus,
@@ -17,17 +18,19 @@ import { type GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { BalanceList } from '~/components/Expense/BalanceList';
 import { ExpenseList } from '~/components/Expense/ExpenseList';
 import AddMembers from '~/components/group/AddMembers';
+import { GroupExport } from '~/components/group/GroupExport';
 import GroupMyBalance from '~/components/group/GroupMyBalance';
 import NoMembers from '~/components/group/NoMembers';
 import MainLayout from '~/components/Layout/MainLayout';
 import { EntityAvatar } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import { AppDrawer } from '~/components/ui/drawer';
+import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { SimpleConfirmationDialog } from '~/components/SimpleConfirmationDialog';
 import { DefaultSplitSettings } from '~/components/DefaultSplit/DefaultSplitSettings';
@@ -66,6 +69,17 @@ const BalancePage: NextPageWithUser<{
   const clearDefaultSplitMutation = api.group.clearDefaultSplit.useMutation();
 
   const [isInviteCopied, setIsInviteCopied] = useState(false);
+  const [expenseSearch, setExpenseSearch] = useState('');
+
+  const filteredExpenses = useMemo(() => {
+    const query = expenseSearch.trim().toLowerCase();
+    if (!query) {
+      return expensesQuery.data;
+    }
+    return expensesQuery.data?.filter(
+      (e) => e.name.toLowerCase().includes(query) || e.category.toLowerCase().includes(query),
+    );
+  }, [expensesQuery.data, expenseSearch]);
 
   const inviteMembers = useCallback(async () => {
     if (!groupDetailQuery.data) {
@@ -545,6 +559,13 @@ const BalancePage: NextPageWithUser<{
                   </>
                 )}
               </Button>
+
+              <GroupExport
+                expenses={expensesQuery.data}
+                fileName={`expenses_${groupDetailQuery.data?.name ?? 'group'}`}
+                currentUserId={user.id}
+                disabled={!expensesQuery.data?.length}
+              />
             </div>
             <Tabs defaultValue="expenses">
               <TabsList className="mx-auto grid w-full max-w-96 grid-cols-2">
@@ -552,9 +573,27 @@ const BalancePage: NextPageWithUser<{
                 <TabsTrigger value="balances">{t('group_details.tabs.balances')}</TabsTrigger>
               </TabsList>
               <TabsContent value="expenses">
+                <div className="mb-4">
+                  <Input
+                    type="search"
+                    placeholder={t('group_details.search_expenses')}
+                    value={expenseSearch}
+                    onChange={(e) => setExpenseSearch(e.target.value)}
+                    rightIcon={
+                      expenseSearch ? (
+                        <X
+                          className="h-4 w-4 cursor-pointer text-gray-400"
+                          onClick={() => setExpenseSearch('')}
+                        />
+                      ) : (
+                        <Search className="h-4 w-4 text-gray-400" />
+                      )
+                    }
+                  />
+                </div>
                 <ExpenseList
                   userId={user.id}
-                  expenses={expensesQuery.data}
+                  expenses={filteredExpenses}
                   contactId={groupId}
                   isLoading={expensesQuery.isPending}
                   isGroup

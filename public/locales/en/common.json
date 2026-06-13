@@ -255,6 +255,7 @@
   "group_details": {
     "add_members": "Add members",
     "copied": "Copied",
+    "search_expenses": "Search expenses",
     "create_group": {
       "group_name_placeholder": "Group name",
       "title": "Create a group"
