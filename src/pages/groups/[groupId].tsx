@@ -561,10 +561,10 @@ const BalancePage: NextPageWithUser<{
               </Button>
 
               <GroupExport
-                expenses={expensesQuery.data}
+                expenses={filteredExpenses}
                 fileName={`expenses_${groupDetailQuery.data?.name ?? 'group'}`}
                 currentUserId={user.id}
-                disabled={!expensesQuery.data?.length}
+                disabled={!filteredExpenses?.length}
               />
             </div>
             <Tabs defaultValue="expenses">

@@ -5,6 +5,7 @@ import React from 'react';
 
 import { Button } from '~/components/ui/button';
 import { useTranslationWithUtils } from '~/hooks/useTranslationWithUtils';
+import { toCsv } from '~/utils/csv';
 
 interface ExportCSVProps {
   expenses?: (Expense & { expenseParticipants: ExpenseParticipant[] })[];
@@ -39,8 +40,7 @@ export const Export: React.FC<ExportCSVProps> = ({
   const { getCurrencyHelpersCached } = useTranslationWithUtils('common');
 
   const exportToCSV = () => {
-    const csvHeaders = headers.join(',');
-    const csvData = expenses.map((expense) => {
+    const rows = expenses.map((expense) => {
       const youPaid = expense.paidBy === currentUserId;
       const yourExpense = expense.expenseParticipants.find(
         (p) => p.userId === (youPaid ? friendId : currentUserId),
@@ -63,14 +63,7 @@ export const Export: React.FC<ExportCSVProps> = ({
       ];
     });
 
-    const csvContent = [
-      csvHeaders,
-      ...csvData.map((row) =>
-        row
-          .map((cell) => ('string' === typeof cell && cell.includes(',') ? `"${cell}"` : cell))
-          .join(','),
-      ),
-    ].join('\n');
+    const csvContent = toCsv(headers, rows);
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');

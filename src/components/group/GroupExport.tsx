@@ -6,6 +6,7 @@ import React from 'react';
 import { Button } from '~/components/ui/button';
 import { useTranslationWithUtils } from '~/hooks/useTranslationWithUtils';
 import type { ExpenseRouter } from '~/server/api/routers/expense';
+import { toCsv } from '~/utils/csv';
 
 type GroupExpenses = inferRouterOutputs<ExpenseRouter>['getGroupExpenses'];
 
@@ -20,7 +21,7 @@ export const GroupExport: React.FC<{
   currentUserId: number;
   disabled?: boolean;
 }> = ({ expenses = [], fileName, currentUserId, disabled = false }) => {
-  const { getCurrencyHelpersCached, displayName } = useTranslationWithUtils('common');
+  const { t, getCurrencyHelpersCached, displayName } = useTranslationWithUtils('common');
 
   const headers = [
     'Date',
@@ -34,7 +35,7 @@ export const GroupExport: React.FC<{
   ];
 
   const exportToCSV = () => {
-    const csvData = expenses.map((expense) => {
+    const rows = expenses.map((expense) => {
       const { parseToCleanString } = getCurrencyHelpersCached(expense.currency);
       const yourShare =
         expense.expenseParticipants.find((p) => p.userId === currentUserId)?.amount ?? 0n;
@@ -51,14 +52,7 @@ export const GroupExport: React.FC<{
       ];
     });
 
-    const csvContent = [
-      headers.join(','),
-      ...csvData.map((row) =>
-        row
-          .map((cell) => ('string' === typeof cell && cell.includes(',') ? `"${cell}"` : cell))
-          .join(','),
-      ),
-    ].join('\n');
+    const csvContent = toCsv(headers, rows);
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -75,7 +69,7 @@ export const GroupExport: React.FC<{
 
   return (
     <Button size="sm" responsiveIcon variant="secondary" onClick={exportToCSV} disabled={disabled}>
-      <Download className="size-4 text-gray-400" /> Export
+      <Download className="size-4 text-gray-400" /> {t('actions.export')}
     </Button>
   );
 };
