@@ -1,3 +1,18 @@
+> **Fork notice** — this is a self-hosted fork of
+> **[Split Pro](https://github.com/oss-apps/split-pro)** that tracks upstream and
+> adds a few group quality-of-life features:
+>
+> - **In-app group expense search** + a **group CSV export**
+> - A **"Pay with Venmo"** settle-up button (with an optional saved username)
+> - A **trailing-cents display fix** (`$4.20` no longer renders as `$4.2`)
+>
+> See **[`NOTES.md`](NOTES.md)** for exactly what changed and why — each addition
+> is written to be a clean, separable upstream pull request. All credit for Split
+> Pro itself belongs to **[OSS Apps](https://github.com/oss-apps)** and its
+> contributors; this fork preserves their original **MIT license**.
+
+---
+
 <p align="center" style="margin-top: 12px">
   <a href="https://splitpro.app">
   <img width="100px"  style="border-radius: 50%;" src="https://splitpro.app/logo_circle.png" alt="SplitPro Logo">
