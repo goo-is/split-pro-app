@@ -137,7 +137,7 @@ const AccountPage: NextPageWithUser<{
           >
             <AccountButton>
               <Wallet className="size-5 text-[#008CFF]" />
-              Venmo username
+              {t('venmo.username')}
             </AccountButton>
           </UpdateVenmoHandle>
 

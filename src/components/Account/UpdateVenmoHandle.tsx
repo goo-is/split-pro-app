@@ -1,7 +1,9 @@
+import { useTranslation } from 'next-i18next';
 import React, { type ReactNode, useState } from 'react';
 import { toast } from 'sonner';
 
 import { api } from '~/utils/api';
+import { normalizeVenmoHandle } from '~/utils/venmo';
 import { AppDrawer } from '../ui/drawer';
 import { Input } from '../ui/input';
 
@@ -14,19 +16,24 @@ export const UpdateVenmoHandle: React.FC<{
   children: ReactNode;
   defaultHandle?: string | null;
 }> = ({ children, defaultHandle }) => {
+  const { t } = useTranslation();
   const [handle, setHandle] = useState(defaultHandle ?? '');
   const updateMutation = api.user.updateUserDetail.useMutation();
   const utils = api.useUtils();
 
+  const trimmed = handle.trim();
+  const normalized = normalizeVenmoHandle(trimmed);
+  const isInvalid = 0 < trimmed.length && null === normalized;
+
   const onSave = () => {
     updateMutation.mutate(
-      { venmoHandle: handle.trim() || null },
+      { venmoHandle: normalized },
       {
         onSuccess: () => {
-          toast.success('Venmo username saved', { duration: 1500 });
+          toast.success(t('venmo.saved'), { duration: 1500 });
           utils.user.invalidate().catch(console.error);
         },
-        onError: () => toast.error('Could not save Venmo username'),
+        onError: () => toast.error(t('venmo.save_error')),
       },
     );
   };
@@ -34,22 +41,21 @@ export const UpdateVenmoHandle: React.FC<{
   return (
     <AppDrawer
       trigger={children}
-      title="Venmo username"
-      actionTitle="Save"
+      title={t('venmo.username')}
+      actionTitle={t('actions.save')}
       actionOnClick={onSave}
+      actionDisabled={isInvalid}
       className="h-[60vh]"
       shouldCloseOnAction
     >
       <div className="mt-6 flex flex-col gap-3">
-        <p className="text-sm text-gray-400">
-          Used to prefill the recipient when someone pays you back with Venmo. Enter just your
-          username — the part after the @ (or paste your venmo.com profile link).
-        </p>
+        <p className="text-sm text-gray-400">{t('venmo.help')}</p>
         <Input
-          placeholder="e.g. Jane-Doe"
+          placeholder={t('venmo.placeholder')}
           value={handle}
           onChange={(e) => setHandle(e.target.value)}
         />
+        {isInvalid ? <p className="text-xs text-red-500">{t('venmo.invalid')}</p> : null}
       </div>
     </AppDrawer>
   );

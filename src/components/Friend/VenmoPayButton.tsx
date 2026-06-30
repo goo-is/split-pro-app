@@ -1,6 +1,8 @@
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 
-import { getCurrencyHelpers } from '~/utils/numbers';
+import { BigMath, getCurrencyHelpers } from '~/utils/numbers';
+import { buildVenmoPayLink } from '~/utils/venmo';
 import { Button } from '../ui/button';
 
 /**
@@ -12,38 +14,31 @@ import { Button } from '../ui/button';
  * Venmo is USD-only, so the button hides itself for other currencies.
  */
 export const VenmoPayButton: React.FC<{
-  amount: bigint; // Absolute value, minor units
+  amount: bigint; // Minor units; sign is ignored (the button always settles a positive amount)
   currency: string;
   txn?: 'pay' | 'charge';
   note?: string;
   recipientHandle?: string;
-}> = ({ amount, currency, txn = 'pay', note = 'Settle up', recipientHandle }) => {
-  if (currency !== 'USD' || amount <= 0n) {
+}> = ({ amount, currency, txn = 'pay', note, recipientHandle }) => {
+  const { t } = useTranslation();
+
+  const absAmount = BigMath.abs(amount);
+  if ('USD' !== currency || absAmount <= 0n) {
     return null;
   }
 
   // Force en-US so the decimal separator is a dot, which Venmo expects.
   const { parseToCleanString } = getCurrencyHelpers({ currency });
-  const amountStr = parseToCleanString(amount).replace(/,/g, '.');
-
-  // Accept "@name", "venmo.com/u/name", or a bare username.
-  const handle = recipientHandle
-    ?.trim()
-    .replace(/^@/, '')
-    .replace(/^https?:\/\//, '')
-    .replace(/^venmo\.com\/(u\/)?/, '');
-
-  const params = `txn=${txn}&amount=${amountStr}&note=${encodeURIComponent(note)}${
-    handle ? `&recipients=${encodeURIComponent(handle)}` : ''
-  }`;
-  const venmoLink = `venmo://paycharge?${params}`;
+  const venmoLink = buildVenmoPayLink({
+    amount: parseToCleanString(absAmount),
+    txn,
+    note: note ?? t('ui.settle_up_name'),
+    handle: recipientHandle,
+  });
 
   return (
-    <Button
-      asChild
-      className="gap-2 bg-[#008CFF] text-white hover:bg-[#008CFF]/90"
-    >
-      <a href={venmoLink}>{txn === 'charge' ? 'Request on Venmo' : 'Pay with Venmo'}</a>
+    <Button asChild className="gap-2 bg-[#008CFF] text-white hover:bg-[#008CFF]/90">
+      <a href={venmoLink}>{'charge' === txn ? t('venmo.request') : t('venmo.pay')}</a>
     </Button>
   );
 };

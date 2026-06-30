@@ -444,5 +444,15 @@
     "show_all_currencies": "Show all currencies",
     "today": "Today",
     "in_group": "In group"
+  },
+  "venmo": {
+    "pay": "Pay with Venmo",
+    "request": "Request on Venmo",
+    "username": "Venmo username",
+    "help": "Used to prefill the recipient when someone pays you back with Venmo. Enter just your username — the part after the @ (or paste your venmo.com profile link).",
+    "placeholder": "e.g. Jane-Doe",
+    "saved": "Venmo username saved",
+    "save_error": "Could not save Venmo username",
+    "invalid": "That doesn't look like a Venmo username"
   }
 }
